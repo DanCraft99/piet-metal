@@ -1,3 +1,5 @@
+Forked project for experimenting 2D graphics with metal and UIKit
+
 # piet-metal
 
 This repository is currently an experiment in using GPU compute to implement the piet 2D graphics API. In its initial stages it is an Objective-C macOS application, to make it easier to use Xcode tools. When it becomes more functional, Rust bindings will be added, with the Objective-C code for the Metal bindings built from the Rust library's build.rs.
