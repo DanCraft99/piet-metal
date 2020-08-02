@@ -230,8 +230,9 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# When building from Xcode we want to ensure that `cargo` is in PATH.\n# as a convenience, add the default cargo install location\nexport PATH=\"$PATH:${HOME}/.cargo/bin\"\n\nset -e\n\nif [[ $CONFIGURATION = \"Debug\" ]]; then\nRUST_CONFIGURATION=\"debug\"\nRUST_CONFIGURATION_FLAG=\"\"\nelse\nRUST_CONFIGURATION=\"release\"\nRUST_CONFIGURATION_FLAG=\"--release\"\nfi\n\ncd \"${SRCROOT}\"\n\necho \"rust config ${RUST_CONFIGURATION}, action ${ACTION}\"\n\nif [[ ${ACTION:-build} = \"build\" ]]; then\ncargo build $RUST_CONFIGURATION_FLAG\ncp \"${SRCROOT}/target/${RUST_CONFIGURATION}/libpiet_metal.a\" \"${BUILT_PRODUCTS_DIR}/\"\n#cp \"${SRCROOT}/include/piet_metal.h\" \"${BUILT_PRODUCTS_DIR}/\"\nelif [[ $ACTION = \"clean\" ]]; then\necho \"cleaning\"\ncargo clean\nfi\n\nset +e\n";
-		};
+			/*shellScript = "# When building from Xcode we want to ensure that `cargo` is in PATH.\n# as a convenience, add the default cargo install location\nexport PATH=\"$PATH:${HOME}/.cargo/bin\"\n\nset -e\n\nif [[ $CONFIGURATION = \"Debug\" ]]; then\nRUST_CONFIGURATION=\"debug\"\nRUST_CONFIGURATION_FLAG=\"\"\nelse\nRUST_CONFIGURATION=\"release\"\nRUST_CONFIGURATION_FLAG=\"--release\"\nfi\n\ncd \"${SRCROOT}\"\n\necho \"rust config ${RUST_CONFIGURATION}, action ${ACTION}\"\n\nif [[ ${ACTION:-build} = \"build\" ]]; then\ncargo build $RUST_CONFIGURATION_FLAG\ncp \"${SRCROOT}/target/${RUST_CONFIGURATION}/libpiet_metal.a\" \"${BUILT_PRODUCTS_DIR}/\"\n#cp \"${SRCROOT}/include/piet_metal.h\" \"${BUILT_PRODUCTS_DIR}/\"\nelif [[ $ACTION = \"clean\" ]]; then\necho \"cleaning\"\ncargo clean\nfi\n\nset +e\n";
+            */
+        };
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */

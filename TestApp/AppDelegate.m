@@ -1,6 +1,6 @@
 //  Copyright 2019 The xi-editor authors.
 
-#import "AppDelegate.h"
+#include "AppDelegate.h"
 
 @interface AppDelegate ()
 

@@ -1,9 +1,10 @@
 //  Copyright 2019 The xi-editor authors.
 
-@import MetalKit;
+#include <MetalKit/MetalKit.h>
 
 #import "PietRenderer.h"
 #import "PietShaderTypes.h"
+#include "SceneEncoder.h"
 #include "piet_metal.h"
 
 @implementation PietRenderer {
@@ -46,7 +47,7 @@
         _renderPipelineState = [_device newRenderPipelineStateWithDescriptor:pipelineDescriptor error: &error];
 
         _commandQueue = [_device newCommandQueue];
-        
+
         NSUInteger tileBufSizeBytes = maxTilesWidth * maxTilesHeight * tileBufSize;
         // Note: consider using managed here, worth experimenting with.
         MTLResourceOptions sceneOptions = MTLResourceStorageModeShared | MTLResourceCPUCacheModeWriteCombined;
@@ -86,7 +87,7 @@
     MTLSize threadgroupCount = MTLSizeMake(nTilesX, nTilesY, 1);
     [computeEncoder dispatchThreadgroups:threadgroupCount threadsPerThreadgroup:threadgroupSize];
     [computeEncoder endEncoding];
-    
+
     MTLRenderPassDescriptor *renderPassDescriptor = view.currentRenderPassDescriptor;
     if (renderPassDescriptor != nil) {
         id<MTLRenderCommandEncoder> renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptor];
@@ -121,7 +122,7 @@
     descriptor.width = nTilesX;
     descriptor.height = nTilesY;
     _loTexture = [_device newTextureWithDescriptor:descriptor];
-    
+
     uint vertexLen = nTilesX * nTilesY * sizeof(RenderVertex);
     MTLResourceOptions vertexOptions = MTLResourceStorageModeShared | MTLResourceCPUCacheModeWriteCombined;
     _vertexBuf = [_device newBufferWithLength:vertexLen options:vertexOptions];
@@ -145,7 +146,7 @@
     [self initScene];
 }
 
-/*
+
 - (void)initCardioid {
     float cx = 1024;
     float cy = 768;
@@ -195,13 +196,13 @@
 
  - (void)initScene {
     //[self initCircles];
-    //[self initCardioid];
-    [self fillTest];
+    [self initCardioid];
+    //[self fillTest];
 }
-*/
 
-- (void)initScene {
-    init_test_scene(_sceneBuf.contents, _sceneBuf.allocatedSize);
-}
+
+// - (void)initScene {
+//     init_test_scene(_sceneBuf.contents, _sceneBuf.allocatedSize);
+// }
 
 @end

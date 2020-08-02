@@ -1,9 +1,8 @@
 //  Copyright 2019 The xi-editor authors.
 
-#import <Cocoa/Cocoa.h>
+#include <Cocoa/Cocoa.h>
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 
 
 @end
-
