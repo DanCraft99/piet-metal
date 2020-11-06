@@ -285,7 +285,7 @@ fn make_path_test(encoder: &mut Encoder) {
 
 fn make_tiger(encoder: &mut Encoder) {
     let scale = 8.0;
-    let tiger_svg = include_bytes!("../Ghostscript_Tiger.svg");
+    let tiger_svg = include_bytes!("../../Ghostscript_Tiger.svg");
     let doc = Document::parse(std::str::from_utf8(tiger_svg).unwrap()).unwrap();
     let root = doc.root_element();
     let g = root.first_element_child().unwrap();

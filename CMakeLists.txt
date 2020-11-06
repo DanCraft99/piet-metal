@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.15)
 project(example C CXX OBJC)
 
-set(APP piet-metal)
+find_package(Corrosion REQUIRED)
 
-MESSAGE(STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS} )
+set(APP Piet-metal)
 
 set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO")
 set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "")
@@ -25,14 +25,20 @@ add_executable(${APP} MACOSX_BUNDLE
     ${APP_STORYBOARD}
 )
 
+message(${CMAKE_CXX_COMPILER_ID})
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_compile_options(${APP} PRIVATE -fcxx-modules -fmodules)
+endif()
+
 # Handle the Storyboard ourselves
-if(NOT CMAKE_GENERATOR MATCHES "Xcode")
-    find_program(IBTOOL ibtool HINTS "/usr/bin" "${OSX_DEVELOPER_ROOT}/usr/bin")
+if(NOT ${CMAKE_GENERATOR} MATCHES "^Xcode.*")
+    # Compile the storyboard file with the ibtool.
+    find_program(IBTOOL NAMES ibtool)
     add_custom_command(TARGET ${APP} POST_BUILD
         COMMAND ${IBTOOL} --errors --warnings --notices --output-format human-readable-text
             --compile ${CMAKE_CURRENT_BINARY_DIR}/${APP}.app/Contents/Resources/Main.storyboardc
             ${APP_STORYBOARD}
-        COMMENT "Compiling storyboard"
+            COMMENT "Compiling storyboard"
     )
 endif()
 
@@ -76,10 +82,14 @@ target_include_directories(${APP} PUBLIC
 
 build_metal_shader(${APP} TestApp/PietRender.metal)
 
+#rust module import through corrosion
+corrosion_import_crate(MANIFEST_PATH piet_metal/Cargo.toml)
+
 target_link_libraries(${APP}
     "-lobjc"
     "-framework Cocoa"
     "-framework Metal"
     "-framework MetalKit"
     "-framework QuartzCore"
+    piet_metal
 )

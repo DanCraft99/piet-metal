@@ -194,15 +194,15 @@
     [encoder endGroup];
 }
 
- - (void)initScene {
-    //[self initCircles];
-    [self initCardioid];
+- (void)initScene {
+    [self initCircles];
+    //[self initCardioid];
     //[self fillTest];
 }
 
 
-// - (void)initScene {
+//- (void)initScene {
 //     init_test_scene(_sceneBuf.contents, _sceneBuf.allocatedSize);
-// }
+//}
 
 @end
