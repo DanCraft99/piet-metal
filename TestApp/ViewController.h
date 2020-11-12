@@ -1,9 +1,10 @@
 //  Copyright 2019 The xi-editor authors.
 
-#include <Cocoa/Cocoa.h>
+#import <Cocoa/Cocoa.h>
 
-#include <MetalKit/MetalKit.h>
+@import MetalKit;
 
 @interface ViewController : NSViewController
 
 @end
+

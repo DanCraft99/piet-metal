@@ -1,6 +1,6 @@
 //  Copyright 2019 The xi-editor authors.
 
-#include <MetalKit/MetalKit.h>
+@import MetalKit;
 
 #import "PietShaderTypes.h"
 #import "SceneEncoder.h"
@@ -125,3 +125,4 @@
 }
 
 @end
+

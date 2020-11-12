@@ -83,7 +83,7 @@ target_include_directories(${APP} PUBLIC
 build_metal_shader(${APP} TestApp/PietRender.metal)
 
 #rust module import through corrosion
-corrosion_import_crate(MANIFEST_PATH piet_metal/Cargo.toml)
+corrosion_import_crate(MANIFEST_PATH Cargo.toml)
 
 target_link_libraries(${APP}
     "-lobjc"

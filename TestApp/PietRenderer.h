@@ -1,6 +1,6 @@
 //  Copyright 2019 The xi-editor authors.
 
-#include <MetalKit/MetalKit.h>
+@import MetalKit;
 
 @interface PietRenderer : NSObject<MTKViewDelegate>
 
