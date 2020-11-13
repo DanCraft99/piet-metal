@@ -32,14 +32,15 @@
 }
 
 - (void)beginGroup:(uint)nItems {
-    uint size = sizeof(SimpleGroup) - sizeof(vector_ushort4) + nItems * (sizeof(vector_ushort4) + sizeof(PietItem));
+    uint size = sizeof(SimpleGroup) + nItems * (sizeof(vector_ushort4) + sizeof(PietItem));
     uint ix = [self alloc:size];
     SimpleGroup *group = (SimpleGroup *)(_buf + ix);
     // Does zero-size array work in obj-C?
-    _bboxIx = ix + sizeof(SimpleGroup) - sizeof(vector_ushort4);
+    _bboxIx = ix + sizeof(SimpleGroup);
     _ix = _bboxIx + sizeof(vector_ushort4) * nItems;
     group->nItems = nItems;
     group->itemsIx = _ix;
+    group->bboxes = _bboxIx;
     _count = nItems;
 }
 

@@ -22,7 +22,7 @@ typedef struct SimpleGroup {
     uint nItems;
     // Offset in bytes to items
     uint itemsIx;
-    vector_ushort4 bbox[1];
+    uint bboxes;
 } SimpleGroup;
 
 typedef struct PietCircle {
@@ -64,7 +64,7 @@ typedef union PietItem {
 } PietItem;
 
 // This should be an enum but the storage needs to be of fixed size
-#define PIET_ITEM_CIRCLE 1
-#define PIET_ITEM_LINE 2
-#define PIET_ITEM_FILL 3
-#define PIET_ITEM_STROKE_POLYLINE 4
+#define PIET_ITEM_CIRCLE 0
+#define PIET_ITEM_LINE 1
+#define PIET_ITEM_FILL 2
+#define PIET_ITEM_STROKE_POLYLINE 3

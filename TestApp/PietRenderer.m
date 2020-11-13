@@ -4,6 +4,7 @@
 
 #import "PietRenderer.h"
 #import "PietShaderTypes.h"
+#import "SceneEncoder.h"
 #include "piet_metal.h"
 
 @implementation PietRenderer {
@@ -145,7 +146,6 @@
     [self initScene];
 }
 
-/*
 - (void)initCardioid {
     float cx = 1024;
     float cy = 768;
@@ -196,11 +196,7 @@
  - (void)initScene {
     //[self initCircles];
     //[self initCardioid];
-    [self fillTest];
-}
-*/
-
-- (void)initScene {
+    //[self fillTest];
     init_test_scene(_sceneBuf.contents, _sceneBuf.allocatedSize);
 }
 
