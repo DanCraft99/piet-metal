@@ -5,18 +5,19 @@
 // scene from new (merged) generator
 
 inline uint extract_8bit_value(uint bit_shift, uint package) {
-    uint mask = 255;
-    uint result = (package >> bit_shift) & mask;
-
-    return result;
+    return (package >> bit_shift) & 255;;
 }
 
 inline uint extract_16bit_value(uint bit_shift, uint package) {
-    uint mask = 65535;
-    uint result = (package >> bit_shift) & mask;
-
-    return result;
+    return (package >> bit_shift) & 65535;;
 }
+
+#define SIMPLE_GROUP_SIZE 12
+#define PIET_ITEM_SIZE 32
+#define PietItem_Circle 0
+#define PietItem_Line 1
+#define PietItem_Fill 2
+#define PietItem_Poly 3
 
 typedef uint SimpleGroupRef;
 typedef uint PietCircleRef;
@@ -34,14 +35,9 @@ struct SimpleGroupPacked {
 inline SimpleGroupPacked SimpleGroup_read(const device char *buf, SimpleGroupRef ref) {
     SimpleGroupPacked result;
 
-    uint n_items = *(device const uint*)(buf + ref);
-    result.n_items = n_items;
-
-    PietItemRef items = *(device const uint*)(buf + ref + 4);
-    result.items = items;
-
-    uint bboxes = *(device const uint*)(buf + ref + 8);
-    result.bboxes = bboxes;
+    result.n_items = *(device const uint*)(buf + ref);
+    result.items = *(device const uint*)(buf + ref + 4);
+    result.bboxes = *(device const uint*)(buf + ref + 8);
 
     return result;
 }
@@ -84,6 +80,8 @@ struct PietCirclePacked {
 inline PietCirclePacked PietCircle_read(const device char *buf, PietCircleRef ref) {
     PietCirclePacked result;
 
+    result.tag = PietItem_Circle;
+
     return result;
 }
 
@@ -92,7 +90,6 @@ struct PietCircle {
 
 inline PietCircle PietCircle_unpack(PietCirclePacked packed_form) {
     PietCircle result;
-
 
     return result;
 }
@@ -109,47 +106,14 @@ struct PietStrokeLinePacked {
 inline PietStrokeLinePacked PietStrokeLine_read(const device char *buf, PietStrokeLineRef ref) {
     PietStrokeLinePacked result;
 
-    uint flags = *(device const uint*)(buf + ref + 4);
-    result.flags = flags;
-
-    uint rgba_color = *(device const uint*)(buf + ref + 8);
-    result.rgba_color = rgba_color;
-
-    float width = as_type<float>(*(device const uint*)(buf + ref + 12));
-    result.width = width;
-
-    float2 start = as_type<float2>(*(device const packed_uint2*)(buf + ref + 16));
-    result.start = start;
-
-    float2 end = as_type<float2>(*(device const packed_uint2*)(buf + ref + 24));
-    result.end = end;
+    result.tag = PietItem_Line;
+    result.flags = *(device const uint*)(buf + ref + 4);
+    result.rgba_color = *(device const uint*)(buf + ref + 8);
+    result.width = as_type<float>(*(device const uint*)(buf + ref + 12));
+    result.start = as_type<float2>(*(device const packed_uint2*)(buf + ref + 16));
+    result.end = as_type<float2>(*(device const packed_uint2*)(buf + ref + 24));
 
     return result;
-}
-
-inline uint PietStrokeLine_flags(const device char *buf, PietStrokeLineRef ref) {
-    uint flags = *(device const uint*)(buf + ref + 4);
-    return flags;
-}
-
-inline uint PietStrokeLine_rgba_color(const device char *buf, PietStrokeLineRef ref) {
-    uint rgba_color = *(device const uint*)(buf + ref + 8);
-    return rgba_color;
-}
-
-inline float PietStrokeLine_width(const device char *buf, PietStrokeLineRef ref) {
-    float width = as_type<float>(*(device const uint*)(buf + ref + 12));
-    return width;
-}
-
-inline float2 PietStrokeLine_start(const device char *buf, PietStrokeLineRef ref) {
-    float2 start = as_type<float2>(*(device const packed_uint2*)(buf + ref + 16));
-    return start;
-}
-
-inline float2 PietStrokeLine_end(const device char *buf, PietStrokeLineRef ref) {
-    float2 end = as_type<float2>(*(device const packed_uint2*)(buf + ref + 24));
-    return end;
 }
 
 struct PietStrokeLine {
@@ -183,39 +147,13 @@ struct PietFillPacked {
 inline PietFillPacked PietFill_read(const device char *buf, PietFillRef ref) {
     PietFillPacked result;
 
-    uint flags = *(device const uint*)(buf + ref + 4);
-    result.flags = flags;
-
-    uint rgba_color = *(device const uint*)(buf + ref + 8);
-    result.rgba_color = rgba_color;
-
-    uint n_points = *(device const uint*)(buf + ref + 12);
-    result.n_points = n_points;
-
-    uint points_ix = *(device const uint*)(buf + ref + 16);
-    result.points_ix = points_ix;
+    result.tag = PietItem_Fill;
+    result.flags = *(device const uint*)(buf + ref + 4);
+    result.rgba_color = *(device const uint*)(buf + ref + 8);
+    result.n_points = *(device const uint*)(buf + ref + 12);
+    result.points_ix = *(device const uint*)(buf + ref + 16);
 
     return result;
-}
-
-inline uint PietFill_flags(const device char *buf, PietFillRef ref) {
-    uint flags = *(device const uint*)(buf + ref + 4);
-    return flags;
-}
-
-inline uint PietFill_rgba_color(const device char *buf, PietFillRef ref) {
-    uint rgba_color = *(device const uint*)(buf + ref + 8);
-    return rgba_color;
-}
-
-inline uint PietFill_n_points(const device char *buf, PietFillRef ref) {
-    uint n_points = *(device const uint*)(buf + ref + 12);
-    return n_points;
-}
-
-inline uint PietFill_points_ix(const device char *buf, PietFillRef ref) {
-    uint points_ix = *(device const uint*)(buf + ref + 16);
-    return points_ix;
 }
 
 struct PietFill {
@@ -247,39 +185,13 @@ struct PietStrokePolyLinePacked {
 inline PietStrokePolyLinePacked PietStrokePolyLine_read(const device char *buf, PietStrokePolyLineRef ref) {
     PietStrokePolyLinePacked result;
 
-    uint rgba_color = *(device const uint*)(buf + ref + 4);
-    result.rgba_color = rgba_color;
-
-    float width = as_type<float>(*(device const uint*)(buf + ref + 8));
-    result.width = width;
-
-    uint n_points = *(device const uint*)(buf + ref + 12);
-    result.n_points = n_points;
-
-    uint points_ix = *(device const uint*)(buf + ref + 16);
-    result.points_ix = points_ix;
+    result.tag = PietItem_Poly;
+    result.rgba_color = *(device const uint*)(buf + ref + 4);
+    result.width = as_type<float>(*(device const uint*)(buf + ref + 8));
+    result.n_points = *(device const uint*)(buf + ref + 12);
+    result.points_ix = *(device const uint*)(buf + ref + 16);
 
     return result;
-}
-
-inline uint PietStrokePolyLine_rgba_color(const device char *buf, PietStrokePolyLineRef ref) {
-    uint rgba_color = *(device const uint*)(buf + ref + 4);
-    return rgba_color;
-}
-
-inline float PietStrokePolyLine_width(const device char *buf, PietStrokePolyLineRef ref) {
-    float width = as_type<float>(*(device const uint*)(buf + ref + 8));
-    return width;
-}
-
-inline uint PietStrokePolyLine_n_points(const device char *buf, PietStrokePolyLineRef ref) {
-    uint n_points = *(device const uint*)(buf + ref + 12);
-    return n_points;
-}
-
-inline uint PietStrokePolyLine_points_ix(const device char *buf, PietStrokePolyLineRef ref) {
-    uint points_ix = *(device const uint*)(buf + ref + 16);
-    return points_ix;
 }
 
 struct PietStrokePolyLine {
@@ -305,18 +217,10 @@ struct PietItem {
     uint body[7];
 };
 inline uint PietItem_tag(const device char *buf, PietItemRef ref) {
-    uint result = *(device const uint*)(buf + ref);
-    return result;
+    return *(device const uint*)(buf + ref);;
 }
 
-#define SIMPLE_GROUP_SIZE 12
-#define PIET_ITEM_SIZE 32
-#define PietItem_Circle 0
-#define PietItem_Line 1
-#define PietItem_Fill 2
-#define PietItem_Poly 3
-
-// Following are older-style accessors (haven't converted ptcl yet)
+// (haven't converted ptcl yet)
 
 typedef uint CmdCircleRef;
 typedef uint CmdLineRef;
@@ -326,131 +230,89 @@ typedef uint CmdFillEdgeRef;
 typedef uint CmdDrawFillRef;
 typedef uint CmdSolidRef;
 typedef uint CmdRef;
+
 struct CmdCirclePacked {
     uint tag;
     ushort4 bbox;
 };
-CmdCirclePacked CmdCircle_read(const device char *buf, CmdCircleRef ref) {
-    return *((const device CmdCirclePacked *)(buf + ref));
-}
-ushort4 CmdCircle_bbox(const device char *buf, CmdCircleRef ref) {
-    return ((const device CmdCirclePacked *)(buf + ref))->bbox;
-}
+
 struct CmdLinePacked {
     uint tag;
     float2 start;
     float2 end;
 };
-CmdLinePacked CmdLine_read(const device char *buf, CmdLineRef ref) {
-    return *((const device CmdLinePacked *)(buf + ref));
-}
-float2 CmdLine_start(const device char *buf, CmdLineRef ref) {
-    return ((const device CmdLinePacked *)(buf + ref))->start;
-}
-float2 CmdLine_end(const device char *buf, CmdLineRef ref) {
-    return ((const device CmdLinePacked *)(buf + ref))->end;
-}
+
 struct CmdStrokePacked {
     uint tag;
     float halfWidth;
     uint rgba_color;
 };
-CmdStrokePacked CmdStroke_read(const device char *buf, CmdStrokeRef ref) {
-    return *((const device CmdStrokePacked *)(buf + ref));
-}
-float CmdStroke_halfWidth(const device char *buf, CmdStrokeRef ref) {
-    return ((const device CmdStrokePacked *)(buf + ref))->halfWidth;
-}
-uint CmdStroke_rgba_color(const device char *buf, CmdStrokeRef ref) {
-    return ((const device CmdStrokePacked *)(buf + ref))->rgba_color;
-}
+
 struct CmdFillPacked {
     uint tag;
     float2 start;
     float2 end;
 };
-CmdFillPacked CmdFill_read(const device char *buf, CmdFillRef ref) {
-    return *((const device CmdFillPacked *)(buf + ref));
-}
-float2 CmdFill_start(const device char *buf, CmdFillRef ref) {
-    return ((const device CmdFillPacked *)(buf + ref))->start;
-}
-float2 CmdFill_end(const device char *buf, CmdFillRef ref) {
-    return ((const device CmdFillPacked *)(buf + ref))->end;
-}
+
 struct CmdFillEdgePacked {
     uint tag;
     int sign;
     float y;
 };
-CmdFillEdgePacked CmdFillEdge_read(const device char *buf, CmdFillEdgeRef ref) {
-    return *((const device CmdFillEdgePacked *)(buf + ref));
-}
-int CmdFillEdge_sign(const device char *buf, CmdFillEdgeRef ref) {
-    return ((const device CmdFillEdgePacked *)(buf + ref))->sign;
-}
-float CmdFillEdge_y(const device char *buf, CmdFillEdgeRef ref) {
-    return ((const device CmdFillEdgePacked *)(buf + ref))->y;
-}
+
 struct CmdDrawFillPacked {
     uint tag;
     int backdrop;
     uint rgba_color;
 };
-CmdDrawFillPacked CmdDrawFill_read(const device char *buf, CmdDrawFillRef ref) {
-    return *((const device CmdDrawFillPacked *)(buf + ref));
-}
-int CmdDrawFill_backdrop(const device char *buf, CmdDrawFillRef ref) {
-    return ((const device CmdDrawFillPacked *)(buf + ref))->backdrop;
-}
-uint CmdDrawFill_rgba_color(const device char *buf, CmdDrawFillRef ref) {
-    return ((const device CmdDrawFillPacked *)(buf + ref))->rgba_color;
-}
+
 struct CmdSolidPacked {
     uint tag;
     uint rgba_color;
 };
-CmdSolidPacked CmdSolid_read(const device char *buf, CmdSolidRef ref) {
-    return *((const device CmdSolidPacked *)(buf + ref));
-}
-uint CmdSolid_rgba_color(const device char *buf, CmdSolidRef ref) {
-    return ((const device CmdSolidPacked *)(buf + ref))->rgba_color;
-}
+
 struct Cmd {
     uint tag;
-    uint body[5];
+    uint body[4];
 };
+
 Cmd Cmd_read(const device char *buf, CmdRef ref) {
     return *((const device Cmd *)(buf + ref));
 }
 uint Cmd_tag(const device char *buf, CmdRef ref) {
     return ((const device Cmd *)(buf + ref))->tag;
 }
-#define Cmd_End 1
-#define Cmd_Circle 2
+#define Cmd_End 0
+#define Cmd_Circle 1
+#define Cmd_Line 2
+#define Cmd_Fill 3
+#define Cmd_Stroke 4
+#define Cmd_FillEdge 5
+#define Cmd_DrawFill 6
+#define Cmd_Solid 7
+#define Cmd_Bail 8
+
 CmdCirclePacked CmdCircle_load(const thread Cmd &s) {
     CmdCirclePacked r;
     r.tag = s.tag;
-    r.bbox = *((const thread ushort4 *)((const thread char *)&s + 8));
+    r.bbox = *((const thread ushort4 *)((const thread char *)&s + 4));
     return r;
 }
-#define Cmd_Line 3
 CmdLinePacked CmdLine_load(const thread Cmd &s) {
     CmdLinePacked r;
     r.tag = s.tag;
-    r.start = *((const thread float2 *)((const thread char *)&s + 8));
-    r.end = *((const thread float2 *)((const thread char *)&s + 16));
+    r.start = *((const thread float2 *)((const thread char *)&s + 4));
+    r.end = *((const thread float2 *)((const thread char *)&s + 12));
     return r;
 }
-#define Cmd_Fill 4
+
 CmdFillPacked CmdFill_load(const thread Cmd &s) {
     CmdFillPacked r;
     r.tag = s.tag;
-    r.start = *((const thread float2 *)((const thread char *)&s + 8));
-    r.end = *((const thread float2 *)((const thread char *)&s + 16));
+    r.start = *((const thread float2 *)((const thread char *)&s + 4));
+    r.end = *((const thread float2 *)((const thread char *)&s + 12));
     return r;
 }
-#define Cmd_Stroke 5
 CmdStrokePacked CmdStroke_load(const thread Cmd &s) {
     CmdStrokePacked r;
     r.tag = s.tag;
@@ -458,7 +320,7 @@ CmdStrokePacked CmdStroke_load(const thread Cmd &s) {
     r.rgba_color = *((const thread uint *)((const thread char *)&s + 8));
     return r;
 }
-#define Cmd_FillEdge 6
+
 CmdFillEdgePacked CmdFillEdge_load(const thread Cmd &s) {
     CmdFillEdgePacked r;
     r.tag = s.tag;
@@ -466,7 +328,7 @@ CmdFillEdgePacked CmdFillEdge_load(const thread Cmd &s) {
     r.y = *((const thread float *)((const thread char *)&s + 8));
     return r;
 }
-#define Cmd_DrawFill 7
+
 CmdDrawFillPacked CmdDrawFill_load(const thread Cmd &s) {
     CmdDrawFillPacked r;
     r.tag = s.tag;
@@ -474,37 +336,55 @@ CmdDrawFillPacked CmdDrawFill_load(const thread Cmd &s) {
     r.rgba_color = *((const thread uint *)((const thread char *)&s + 8));
     return r;
 }
-#define Cmd_Solid 8
+
 CmdSolidPacked CmdSolid_load(const thread Cmd &s) {
     CmdSolidPacked r;
     r.tag = s.tag;
     r.rgba_color = *((const thread uint *)((const thread char *)&s + 4));
     return r;
 }
-#define Cmd_Bail 9
 
-void CmdCircle_write(device char *buf, CmdCircleRef ref, CmdCirclePacked s) {
-    *((device CmdCirclePacked *)(buf + ref)) = s;
+inline void CmdCircle_write(device char *buf, CmdCircleRef ref, CmdCirclePacked s) {
+    *(device uint*)(buf + ref) = s.tag;
+    *(device ushort4*)(buf + ref + 4) = s.bbox;
 }
-void CmdLine_write(device char *buf, CmdLineRef ref, CmdLinePacked s) {
-    *((device CmdLinePacked *)(buf + ref)) = s;
+
+inline void CmdLine_write(device char *buf, CmdLineRef ref, CmdLinePacked s) {
+    *(device uint*)(buf + ref) = s.tag;
+    *(device packed_uint2*)(buf + ref + 4) = as_type<uint2>(s.start);
+    *(device packed_uint2*)(buf + ref + 12) = as_type<uint2>(s.end);
 }
-void CmdStroke_write(device char *buf, CmdStrokeRef ref, CmdStrokePacked s) {
-    *((device CmdStrokePacked *)(buf + ref)) = s;
+
+inline void CmdStroke_write(device char *buf, CmdStrokeRef ref, CmdStrokePacked s) {
+    *(device uint*)(buf + ref) = s.tag;
+    *(device uint*)(buf + ref + 4) = as_type<uint>(s.halfWidth);
+    *(device uint*)(buf + ref + 8) = s.rgba_color;
 }
-void CmdFill_write(device char *buf, CmdFillRef ref, CmdFillPacked s) {
-    *((device CmdFillPacked *)(buf + ref)) = s;
+
+inline void CmdFill_write(device char *buf, CmdFillRef ref, CmdFillPacked s) {
+    *(device uint*)(buf + ref) = s.tag;
+    *(device packed_uint2*)(buf + ref + 4) = as_type<uint2>(s.start);
+    *(device packed_uint2*)(buf + ref + 12) = as_type<uint2>(s.end);
 }
-void CmdFillEdge_write(device char *buf, CmdFillEdgeRef ref, CmdFillEdgePacked s) {
-    *((device CmdFillEdgePacked *)(buf + ref)) = s;
+
+inline void CmdFillEdge_write(device char *buf, CmdFillEdgeRef ref, CmdFillEdgePacked s) {
+    *(device uint*)(buf + ref) = s.tag;
+    *(device uint*)(buf + ref + 4) = as_type<uint>(s.sign);
+    *(device uint*)(buf + ref + 8) = as_type<uint>(s.y);
 }
-void CmdDrawFill_write(device char *buf, CmdDrawFillRef ref, CmdDrawFillPacked s) {
-    *((device CmdDrawFillPacked *)(buf + ref)) = s;
+
+inline void CmdDrawFill_write(device char *buf, CmdDrawFillRef ref, CmdDrawFillPacked s) {
+    *(device uint*)(buf + ref) = s.tag;
+    *(device uint*)(buf + ref + 4) = as_type<uint>(s.backdrop);
+    *(device uint*)(buf + ref + 8) = s.rgba_color;
 }
-void CmdSolid_write(device char *buf, CmdSolidRef ref, CmdSolidPacked s) {
-    *((device CmdSolidPacked *)(buf + ref)) = s;
+
+inline void CmdSolid_write(device char *buf, CmdSolidRef ref, CmdSolidPacked s) {
+    *(device uint*)(buf + ref) = s.tag;
+    *(device uint*)(buf + ref + 4) = s.rgba_color;
 }
+
 void Cmd_write_tag(device char *buf, CmdRef ref, uint tag) {
-    ((device Cmd *)(buf + ref))->tag = tag;
+    *(device uint*)(buf + ref) = tag;
 }
 
